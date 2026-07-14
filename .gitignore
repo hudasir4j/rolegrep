@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Environment & secrets
+.env
+.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Data & local DB (generated at runtime)
+data/*.db
+data/cache/
+*.sqlite3
+
+# Eval artifacts (you'll add labeled CSV later)
+eval/labels.csv
+eval/results/
+
+# Node (for React frontend later)
+node_modules/
+frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db

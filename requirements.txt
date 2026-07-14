@@ -1,0 +1,27 @@
+# Core
+pydantic>=2.6,<3
+httpx>=0.27,<1
+trafilatura>=1.9,<2
+beautifulsoup4>=4.12,<5
+lxml>=5.2,<6
+
+# Agent & LLM (Week 2)
+langgraph>=0.2,<1
+langchain-core>=0.3,<1
+langchain-anthropic>=0.3,<1
+langchain-openai>=0.2,<1
+
+# Storage & API (Week 3+)
+sqlalchemy>=2.0,<3
+apscheduler>=3.10,<4
+fastapi>=0.115,<1
+uvicorn[standard]>=0.32,<1
+
+# Dedup embeddings (Week 2)
+sentence-transformers>=3.0,<4
+numpy>=1.26,<3
+
+# Dev & testing
+pytest>=8.0,<9
+pytest-asyncio>=0.24,<1
+python-dotenv>=1.0,<2
