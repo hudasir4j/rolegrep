@@ -2,7 +2,6 @@
 
 from pathlib import Path
 
-# Project root: .../Internship Scraper/
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
 EVAL_DIR = PROJECT_ROOT / "eval"
@@ -13,3 +12,7 @@ DEFAULT_USER_AGENT = (
     "educational internship monitor)"
 )
 DEFAULT_FETCH_TIMEOUT_SECONDS = 30.0
+
+# LLM defaults (override via CLI flags or env)
+DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-4-20250514"
+DEFAULT_OPENAI_MODEL = "gpt-4o-mini"
