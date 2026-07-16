@@ -3,7 +3,10 @@ Fetch a URL and return clean text from HTML.
 
 Enrichment sources (in priority order when useful):
 1. JSON-LD JobPosting blocks (Ashby, Lever, many ATSs)
-2. Greenhouse boards API when the public job HTML is empty
+2. ATS public APIs when the HTML is a JS shell or empty board
+   - Greenhouse boards API
+   - Ashby posting-api job board
+   - Lever postings API
 3. Trafilatura / BeautifulSoup visible text
 """
 
@@ -15,6 +18,7 @@ import re
 from dataclasses import dataclass
 from html import unescape
 from typing import Any
+from urllib.parse import parse_qs, urlparse
 
 import httpx
 import trafilatura
@@ -28,6 +32,20 @@ _JS_SHELL_RE = re.compile(
 )
 _GREENHOUSE_JOB_RE = re.compile(
     r"(?:job-boards|boards)\.greenhouse\.io/([^/]+)/jobs/(\d+)",
+    re.IGNORECASE,
+)
+_GREENHOUSE_EMBED_RE = re.compile(
+    r"(?:job-boards|boards)\.greenhouse\.io/embed/job_app",
+    re.IGNORECASE,
+)
+_ASHBY_JOB_RE = re.compile(
+    r"jobs\.ashbyhq\.com/([^/]+)/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-"
+    r"[0-9a-f]{4}-[0-9a-f]{12})",
+    re.IGNORECASE,
+)
+_LEVER_JOB_RE = re.compile(
+    r"jobs\.lever\.co/([^/]+)/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-"
+    r"[0-9a-f]{4}-[0-9a-f]{12})",
     re.IGNORECASE,
 )
 
@@ -57,6 +75,14 @@ class FetchPageResult:
         }
 
 
+@dataclass(frozen=True)
+class _AtsLookup:
+    """Result of an ATS API enrichment attempt."""
+
+    text: str | None = None
+    not_found: bool = False
+
+
 def _hash_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
 
@@ -75,6 +101,31 @@ def _strip_html(fragment: str) -> str:
     return unescape(text)
 
 
+def _looks_like_ats_board_chrome(text: str) -> bool:
+    """True for ATS index/filter shells that are not a single job posting."""
+    lower = (text or "").lower()
+    if "job posting (from" in lower or "role title:" in lower:
+        return False
+    signals = (
+        "create a job alert",
+        "create alert",
+        "select...",
+        "current openings",
+        "job type",
+        "job location",
+        "filter by",
+        "salary type",
+    )
+    hits = sum(1 for token in signals if token in lower)
+    # Board pages usually have several filter widgets; require a few hits.
+    if hits >= 3:
+        return True
+    # Greenhouse "Jobs at X" index with search chrome but little body
+    if "jobs at " in lower and "department" in lower and "select..." in lower:
+        return True
+    return False
+
+
 def _is_thin_or_shell(text: str) -> bool:
     cleaned = (text or "").strip()
     if not cleaned:
@@ -84,6 +135,8 @@ def _is_thin_or_shell(text: str) -> bool:
     lower = cleaned.lower()
     if "job posting (from" in lower:
         return False
+    if _looks_like_ats_board_chrome(cleaned):
+        return True
     if "create a job alert" in lower:
         chrome_hits = sum(
             1
@@ -95,6 +148,35 @@ def _is_thin_or_shell(text: str) -> bool:
             return True
     return len(cleaned) < 80
 
+
+def _format_structured_posting(
+    *,
+    source: str,
+    company: str | None,
+    title: str | None,
+    location: str | None,
+    deadline: str | None,
+    body: str,
+    location_type: str | None = None,
+) -> str | None:
+    lines = [f"Job posting (from {source}):"]
+    if company:
+        lines.append(f"Company: {company}")
+    if title:
+        lines.append(f"Role title: {unescape(str(title))}")
+    if location:
+        lines.append(f"Location: {location}")
+    if location_type:
+        lines.append(f"Location type: {location_type}")
+    if deadline:
+        lines.append(f"Application deadline: {deadline}")
+    else:
+        lines.append("Application deadline: not stated")
+    if body:
+        lines.append("")
+        lines.append(body)
+    text = "\n".join(lines).strip()
+    return text if not _is_thin_or_shell(text) else None
 
 
 def _location_from_jsonld(job_location: Any) -> str | None:
@@ -126,29 +208,18 @@ def _location_from_jsonld(job_location: Any) -> str | None:
 def _jobposting_to_text(job: dict[str, Any]) -> str:
     org = job.get("hiringOrganization") or {}
     company = org.get("name") if isinstance(org, dict) else None
-    title = job.get("title")
-    location = _location_from_jsonld(job.get("jobLocation"))
-    loc_type = job.get("jobLocationType")
-    deadline = job.get("validThrough") or job.get("applicationDeadline")
-    description = _strip_html(job.get("description") or "")
-
-    lines = ["Job posting (from structured data on the page):"]
-    if company:
-        lines.append(f"Company: {company}")
-    if title:
-        lines.append(f"Role title: {unescape(str(title))}")
-    if location:
-        lines.append(f"Location: {location}")
-    if loc_type:
-        lines.append(f"Location type: {loc_type}")
-    if deadline:
-        lines.append(f"Application deadline / valid through: {deadline}")
-    else:
-        lines.append("Application deadline: not stated in structured data")
-    if description:
-        lines.append("")
-        lines.append(description)
-    return "\n".join(lines).strip()
+    return (
+        _format_structured_posting(
+            source="structured data on the page",
+            company=company,
+            title=job.get("title"),
+            location=_location_from_jsonld(job.get("jobLocation")),
+            deadline=job.get("validThrough") or job.get("applicationDeadline"),
+            body=_strip_html(job.get("description") or ""),
+            location_type=job.get("jobLocationType"),
+        )
+        or ""
+    )
 
 
 def _iter_jsonld_objects(html: str) -> list[dict[str, Any]]:
@@ -228,68 +299,207 @@ def _merge_texts(*parts: str) -> str:
     return "\n\n".join(kept).strip()
 
 
-def _greenhouse_api_text(page_url: str, client: httpx.Client) -> str | None:
+def _greenhouse_board_and_job(page_url: str) -> tuple[str, str] | None:
     match = _GREENHOUSE_JOB_RE.search(page_url)
-    if not match:
-        return None
-    board, job_id = match.group(1), match.group(2)
+    if match:
+        return match.group(1), match.group(2)
+    if _GREENHOUSE_EMBED_RE.search(page_url):
+        qs = parse_qs(urlparse(page_url).query)
+        board = (qs.get("for") or [None])[0]
+        token = (qs.get("token") or [None])[0]
+        if board and token:
+            return board, token
+    return None
+
+
+def _greenhouse_api_lookup(page_url: str, client: httpx.Client) -> _AtsLookup:
+    parsed = _greenhouse_board_and_job(page_url)
+    if not parsed:
+        return _AtsLookup()
+    board, job_id = parsed
     api_url = f"https://boards-api.greenhouse.io/v1/boards/{board}/jobs/{job_id}"
     try:
         response = client.get(api_url)
     except httpx.RequestError:
-        return None
+        return _AtsLookup()
+    if response.status_code == 404:
+        return _AtsLookup(not_found=True)
     if response.status_code >= 400:
-        return None
+        return _AtsLookup()
     try:
         data = response.json()
     except json.JSONDecodeError:
-        return None
+        return _AtsLookup()
 
-    title = data.get("title")
-    company = data.get("company_name")
-    location = (data.get("location") or {}).get("name")
-    deadline = data.get("application_deadline")
-    body = _strip_html(data.get("content") or "")
+    text = _format_structured_posting(
+        source="Greenhouse API",
+        company=data.get("company_name"),
+        title=data.get("title"),
+        location=(data.get("location") or {}).get("name"),
+        deadline=data.get("application_deadline"),
+        body=_strip_html(data.get("content") or ""),
+    )
+    return _AtsLookup(text=text)
 
-    lines = ["Job posting (from Greenhouse API):"]
-    if company:
-        lines.append(f"Company: {company}")
-    if title:
-        lines.append(f"Role title: {title}")
-    if location:
-        lines.append(f"Location: {location}")
-    if deadline:
-        lines.append(f"Application deadline: {deadline}")
-    else:
-        lines.append("Application deadline: not stated")
-    if body:
-        lines.append("")
-        lines.append(body)
-    text = "\n".join(lines).strip()
-    return text if not _is_thin_or_shell(text) else None
+
+def _ashby_api_lookup(page_url: str, client: httpx.Client) -> _AtsLookup:
+    match = _ASHBY_JOB_RE.search(page_url)
+    if not match:
+        return _AtsLookup()
+    org, job_id = match.group(1), match.group(2)
+    api_url = f"https://api.ashbyhq.com/posting-api/job-board/{org}"
+    try:
+        response = client.get(api_url)
+    except httpx.RequestError:
+        return _AtsLookup()
+    if response.status_code == 404:
+        return _AtsLookup(not_found=True)
+    if response.status_code >= 400:
+        return _AtsLookup()
+    try:
+        payload = response.json()
+    except json.JSONDecodeError:
+        return _AtsLookup()
+
+    jobs = payload.get("jobs") or []
+    hit = next((job for job in jobs if job.get("id") == job_id), None)
+    if hit is None:
+        # Board is reachable but this posting id is gone / unlisted
+        return _AtsLookup(not_found=True)
+
+    location = hit.get("location")
+    if hit.get("isRemote") and location and "remote" not in str(location).lower():
+        location = f"{location} (Remote)"
+    elif hit.get("isRemote") and not location:
+        location = "Remote"
+
+    body = hit.get("descriptionPlain") or _strip_html(hit.get("descriptionHtml") or "")
+    text = _format_structured_posting(
+        source="Ashby job board API",
+        company=org,
+        title=hit.get("title"),
+        location=location,
+        deadline=None,
+        body=body,
+        location_type=hit.get("workplaceType"),
+    )
+    return _AtsLookup(text=text)
+
+
+def _infer_lever_company(data: dict[str, Any], slug: str) -> str:
+    """Best-effort company name when Lever only exposes the URL slug."""
+    desc = (data.get("descriptionPlain") or data.get("descriptionBodyPlain") or "").strip()
+    match = re.match(r"^([A-Za-z0-9][A-Za-z0-9.+&\- ]{0,48}?)\s+is\b", desc)
+    if match:
+        return match.group(1).strip()
+    return slug.replace("-", " ").title()
+
+
+def _lever_api_lookup(page_url: str, client: httpx.Client) -> _AtsLookup:
+    match = _LEVER_JOB_RE.search(page_url)
+    if not match:
+        return _AtsLookup()
+    company, job_id = match.group(1), match.group(2)
+    api_url = f"https://api.lever.co/v0/postings/{company}/{job_id}"
+    try:
+        response = client.get(api_url)
+    except httpx.RequestError:
+        return _AtsLookup()
+    if response.status_code == 404:
+        return _AtsLookup(not_found=True)
+    if response.status_code >= 400:
+        return _AtsLookup()
+    try:
+        data = response.json()
+    except json.JSONDecodeError:
+        return _AtsLookup()
+
+    categories = data.get("categories") or {}
+    location = categories.get("location") or data.get("location")
+    body_parts = [
+        data.get("descriptionPlain") or _strip_html(data.get("description") or ""),
+        data.get("additionalPlain") or _strip_html(data.get("additional") or ""),
+    ]
+    body = "\n\n".join(part for part in body_parts if part)
+
+    # Lever's "text" field is the role title; infer company from posting prose.
+    text = _format_structured_posting(
+        source="Lever API",
+        company=_infer_lever_company(data, company),
+        title=data.get("text"),
+        location=location,
+        deadline=None,
+        body=body,
+        location_type=categories.get("commitment"),
+    )
+    return _AtsLookup(text=text)
+
+
+def _ats_api_fallback(page_url: str, client: httpx.Client) -> _AtsLookup:
+    """Try known ATS APIs when HTML alone is a thin JS shell."""
+    if _greenhouse_board_and_job(page_url):
+        return _greenhouse_api_lookup(page_url, client)
+    if _ASHBY_JOB_RE.search(page_url):
+        return _ashby_api_lookup(page_url, client)
+    if _LEVER_JOB_RE.search(page_url):
+        return _lever_api_lookup(page_url, client)
+    return _AtsLookup()
 
 
 def _html_to_clean_text(html: str, url: str, client: httpx.Client | None = None) -> str:
-    """Prefer structured JobPosting / Greenhouse API over thin JS shells."""
+    """Prefer structured JobPosting / ATS API over thin JS shells.
+
+    Used by unit tests and as a convenience wrapper around the richer
+    resolution logic in ``fetch_page``.
+    """
     structured = _extract_jobposting_text(html)
     visible = _html_to_visible_text(html, url)
 
-    api_text = None
-    if client is not None and (
-        structured is None or _is_thin_or_shell(visible) or _is_thin_or_shell(structured or "")
-    ):
-        # Greenhouse HTML is sometimes just an empty board shell
-        if _GREENHOUSE_JOB_RE.search(url) and _is_thin_or_shell(visible):
-            api_text = _greenhouse_api_text(url, client)
-
     if structured and not _is_thin_or_shell(structured):
-        # Structured data first; append visible only if it adds unique signal
         return _merge_texts(structured, visible if not _is_thin_or_shell(visible) else "")
 
-    if api_text:
-        return api_text
+    if client is not None:
+        lookup = _ats_api_fallback(url, client)
+        if lookup.text:
+            return lookup.text
 
     return visible.strip()
+
+
+def _resolve_clean_text(
+    *,
+    html: str,
+    request_url: str,
+    final_url: str,
+    client: httpx.Client,
+) -> tuple[str, _AtsLookup]:
+    """
+    Resolve the best posting text from HTML + ATS APIs.
+
+    Returns (clean_text, last_ats_lookup) so callers can distinguish
+    ``job_not_found`` from generic thin pages.
+    """
+    structured = _extract_jobposting_text(html)
+    visible = _html_to_visible_text(html, final_url)
+
+    if structured and not _is_thin_or_shell(structured):
+        merged = _merge_texts(
+            structured, visible if not _is_thin_or_shell(visible) else ""
+        )
+        return merged, _AtsLookup()
+
+    # Try the original URL first — Greenhouse often redirects closed jobs to
+    # ``?error=true`` board pages that no longer contain the job id.
+    lookup = _ats_api_fallback(request_url, client)
+    if lookup.text is None and final_url != request_url:
+        alt = _ats_api_fallback(final_url, client)
+        if alt.text or alt.not_found:
+            lookup = alt
+
+    if lookup.text:
+        return lookup.text, lookup
+
+    return visible.strip(), lookup
 
 
 def fetch_page(
@@ -317,6 +527,19 @@ def fetch_page(
         ) as client:
             response = client.get(url)
             if response.status_code >= 400:
+                # Lever often 404s closed jobs at the HTML URL itself
+                if response.status_code == 404 and (
+                    _LEVER_JOB_RE.search(url) or _ASHBY_JOB_RE.search(url)
+                ):
+                    return FetchPageResult(
+                        url=str(response.url),
+                        status_code=response.status_code,
+                        title=None,
+                        clean_text="",
+                        text_length=0,
+                        content_hash=_hash_text(""),
+                        fetch_error="job_not_found",
+                    )
                 return FetchPageResult(
                     url=str(response.url),
                     status_code=response.status_code,
@@ -330,12 +553,12 @@ def fetch_page(
             final_url = str(response.url)
             html = response.text
             title = _extract_title(html)
-            clean_text = _html_to_clean_text(html, final_url, client=client)
-
-            if _is_thin_or_shell(clean_text):
-                api_text = _greenhouse_api_text(final_url, client)
-                if api_text:
-                    clean_text = api_text
+            clean_text, lookup = _resolve_clean_text(
+                html=html,
+                request_url=url,
+                final_url=final_url,
+                client=client,
+            )
     except httpx.RequestError as exc:
         return FetchPageResult(
             url=url,
@@ -347,7 +570,20 @@ def fetch_page(
             fetch_error=f"request_failed: {exc}",
         )
 
-    fetch_error = "insufficient_content" if _is_thin_or_shell(clean_text) else None
+    if _is_thin_or_shell(clean_text):
+        fetch_error = "job_not_found" if lookup.not_found else "insufficient_content"
+        if lookup.not_found:
+            clean_text = ""
+        return FetchPageResult(
+            url=final_url,
+            status_code=response.status_code,
+            title=title,
+            clean_text=clean_text,
+            text_length=len(clean_text),
+            content_hash=_hash_text(clean_text),
+            fetch_error=fetch_error,
+        )
+
     return FetchPageResult(
         url=final_url,
         status_code=response.status_code,
@@ -355,5 +591,5 @@ def fetch_page(
         clean_text=clean_text,
         text_length=len(clean_text),
         content_hash=_hash_text(clean_text),
-        fetch_error=fetch_error,
+        fetch_error=None,
     )

@@ -10,7 +10,7 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from rolegrep.config import DATA_DIR, DEFAULT_DATABASE_URL
+from rolegrep.config import DATA_DIR
 from rolegrep.db.models import Base
 
 _engine: Engine | None = None
@@ -19,7 +19,11 @@ _current_url: str | None = None
 
 
 def database_url(url: str | None = None) -> str:
-    return url or DEFAULT_DATABASE_URL
+    if url:
+        return url
+    from rolegrep import config
+
+    return config.DEFAULT_DATABASE_URL
 
 
 def get_engine(url: str | None = None, *, echo: bool = False) -> Engine:

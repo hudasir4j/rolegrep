@@ -150,3 +150,87 @@ def finish_monitor_run(
     run.errors = errors
     run.notes = notes
     return run
+
+
+def list_postings(
+    session: Session,
+    *,
+    limit: int = 50,
+    offset: int = 0,
+    relevant_only: bool = False,
+    include_duplicates: bool = False,
+) -> list[PostingRecord]:
+    stmt = select(PostingRecord).order_by(PostingRecord.last_seen_at.desc())
+    if relevant_only:
+        stmt = stmt.where(PostingRecord.is_relevant.is_(True))
+    if not include_duplicates:
+        stmt = stmt.where(PostingRecord.is_duplicate.is_(False))
+    stmt = stmt.offset(offset).limit(limit)
+    return list(session.scalars(stmt))
+
+
+def list_watched_urls(
+    session: Session, *, active_only: bool = False
+) -> list[WatchedUrl]:
+    stmt = select(WatchedUrl).order_by(WatchedUrl.id)
+    if active_only:
+        stmt = stmt.where(WatchedUrl.active.is_(True))
+    return list(session.scalars(stmt))
+
+
+def list_monitor_runs(session: Session, *, limit: int = 20) -> list[MonitorRun]:
+    stmt = select(MonitorRun).order_by(MonitorRun.id.desc()).limit(limit)
+    return list(session.scalars(stmt))
+
+
+def deactivate_watched_url(session: Session, url_id: int) -> WatchedUrl | None:
+    row = session.get(WatchedUrl, url_id)
+    if row is None:
+        return None
+    row.active = False
+    return row
+
+
+def posting_to_dict(row: PostingRecord) -> dict[str, Any]:
+    return {
+        "id": row.id,
+        "company": row.company,
+        "role_title": row.role_title,
+        "location": row.location,
+        "deadline": row.deadline.isoformat() if row.deadline else None,
+        "is_relevant": row.is_relevant,
+        "confidence_score": row.confidence_score,
+        "source_url": row.source_url,
+        "extraction_notes": row.extraction_notes,
+        "is_duplicate": row.is_duplicate,
+        "first_seen_at": row.first_seen_at.isoformat() if row.first_seen_at else None,
+        "last_seen_at": row.last_seen_at.isoformat() if row.last_seen_at else None,
+    }
+
+
+def watched_url_to_dict(row: WatchedUrl) -> dict[str, Any]:
+    return {
+        "id": row.id,
+        "url": row.url,
+        "label": row.label,
+        "active": row.active,
+        "created_at": row.created_at.isoformat() if row.created_at else None,
+        "last_checked_at": (
+            row.last_checked_at.isoformat() if row.last_checked_at else None
+        ),
+        "last_error": row.last_error,
+    }
+
+
+def monitor_run_to_dict(row: MonitorRun) -> dict[str, Any]:
+    return {
+        "id": row.id,
+        "started_at": row.started_at.isoformat() if row.started_at else None,
+        "finished_at": row.finished_at.isoformat() if row.finished_at else None,
+        "urls_checked": row.urls_checked,
+        "postings_seen": row.postings_seen,
+        "new_postings": row.new_postings,
+        "duplicates": row.duplicates,
+        "errors": row.errors,
+        "notes": row.notes,
+    }

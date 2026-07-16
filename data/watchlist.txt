@@ -1,7 +1,12 @@
 # One career-page URL per line (optional "url | label").
 # Lines starting with # are ignored.
 #
-# Example:
-# https://job-boards.greenhouse.io/drweng/jobs/7992936 | DRW
-#
-# Tip: `rolegrep-db init --from-labels` seeds from eval/labels.csv.
+# Seed more with: rolegrep-db init --from-labels
+https://job-boards.greenhouse.io/drweng/jobs/7992936 | DRW
+https://job-boards.greenhouse.io/offerup/jobs/8004171 | OfferUp
+https://jobs.ashbyhq.com/centerfield/3279e803-56ab-4e12-8168-c2fd60bc8e60/application | Centerfield
+https://jobs.lever.co/nextgenfed/35e13d92-343a-4c17-9789-1a6a9cff2bc6/apply | NextGen Federal
+https://jobs.ashbyhq.com/maxima/c0204f04-af26-4a57-9658-64ee6d4beb74/application | Maxima
+https://job-boards.greenhouse.io/iherb/jobs/7776154003 | iHerb
+https://jobs.ashbyhq.com/base-power/5353ea33-57d4-46fa-9a96-e392a3f841bc/application | Base Power
+https://jobs.ashbyhq.com/sentry/5e112240-922a-48f1-8865-9e7f89687f39 | Sentry

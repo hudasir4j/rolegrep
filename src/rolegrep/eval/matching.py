@@ -122,6 +122,10 @@ def compare_example(
 def hypothesize_failure(verdicts: list[FieldVerdict], *, fetch_error: str | None) -> str:
     """Short guess for the report / resume failure notes."""
     if fetch_error:
+        if fetch_error == "job_not_found":
+            return (
+                "fetch failed (job_not_found); posting removed or unlisted on ATS"
+            )
         return f"fetch failed ({fetch_error}); page text never reached the LLM"
     missing = [v for v in verdicts if not v.correct and v.predicted is None]
     if missing and all(v.reason == "no_prediction" for v in verdicts):

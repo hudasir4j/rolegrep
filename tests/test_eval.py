@@ -90,7 +90,7 @@ def test_load_real_labels_csv():
     if not path.is_file():
         return  # CI may omit labels
     examples = load_labels(path)
-    assert len(examples) >= 40
+    assert len(examples) >= 25
     assert examples[0].id == "1"
     assert examples[0].company == "DRW"
     assert examples[0].is_relevant is True

@@ -1,6 +1,7 @@
 # Hand-labeled eval set
 
-`labels.csv` is the ground-truth set the agent is scored against.
+`labels.csv` is the ground-truth set the agent is scored against. Dead or unlisted
+postings are moved to `labels_retired.csv` so scores reflect live jobs only.
 
 ## Columns
 
@@ -26,7 +27,7 @@ rolegrep-eval --limit 3
 rolegrep-eval --ids 1,6,15
 ```
 
-Full set (~50 LLM calls):
+Full set (~31 live examples; dead URLs moved to `labels_retired.csv`):
 
 ```bash
 rolegrep-eval

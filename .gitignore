@@ -29,8 +29,9 @@ eval/results/
 eval/runs/
 
 
-# Node (for React frontend later)
+# Node (React dashboard)
 node_modules/
+web/dist/
 frontend/dist/
 
 # OS

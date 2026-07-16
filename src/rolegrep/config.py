@@ -1,9 +1,14 @@
 """Shared configuration."""
 
+from __future__ import annotations
+
+import os
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DATA_DIR = PROJECT_ROOT / "data"
+
+_data_override = os.environ.get("ROLEGREP_DATA_DIR")
+DATA_DIR = Path(_data_override) if _data_override else (PROJECT_ROOT / "data")
 EVAL_DIR = PROJECT_ROOT / "eval"
 DEFAULT_DATABASE_PATH = DATA_DIR / "rolegrep.db"
 DEFAULT_DATABASE_URL = f"sqlite:///{DEFAULT_DATABASE_PATH}"

@@ -44,6 +44,7 @@ rolegrep-eval = "rolegrep.cli:main_eval"
 rolegrep-db = "rolegrep.cli:main_db"
 rolegrep-monitor = "rolegrep.cli:main_monitor"
 rolegrep-scheduler = "rolegrep.cli:main_scheduler"
+rolegrep-api = "rolegrep.cli:main_api"
 
 [tool.setuptools.packages.find]
 where = ["src"]
