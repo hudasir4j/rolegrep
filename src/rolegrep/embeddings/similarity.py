@@ -1,8 +1,8 @@
 """
 Sentence-embedding similarity for catching reposted / reworded listings.
 
-Uses all-MiniLM-L6-v2 (small, fast). Indexed postings live in memory for now;
-Week 3 will persist them in SQLite.
+Uses all-MiniLM-L6-v2 (small, fast). Fingerprints are persisted in SQLite;
+PostingIndex is rebuilt from the DB at the start of each monitor run.
 """
 
 from __future__ import annotations

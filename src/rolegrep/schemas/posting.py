@@ -13,6 +13,18 @@ from typing import Any
 from pydantic import BaseModel, Field, field_validator
 
 
+def _nullish_to_none(value: Any) -> Any:
+    """Treat LLM string sentinels like 'null' / 'none' as real None."""
+    if value is None:
+        return None
+    if isinstance(value, str):
+        text = value.strip()
+        if text == "" or text.casefold() in {"null", "none", "n/a", "na", "unknown"}:
+            return None
+        return text
+    return value
+
+
 class UserProfile(BaseModel):
     """
     A simple description of who we're hunting internships for.
@@ -22,12 +34,17 @@ class UserProfile(BaseModel):
     """
 
     target_roles: list[str] = Field(
-        default_factory=lambda: ["software engineering intern", "ml intern"],
+        default_factory=lambda: [
+            "software engineering intern",
+            "software developer intern",
+            "ml intern",
+            "ai engineer intern",
+        ],
         description="Role titles or keywords we care about",
     )
     preferred_locations: list[str] = Field(
-        default_factory=lambda: ["remote", "united states"],
-        description="Locations we'd accept",
+        default_factory=lambda: ["united states", "usa", "us", "remote", "any us city"],
+        description="Locations we'd accept (US cities and remote)",
     )
     graduation_year: int | None = Field(
         default=None,
@@ -76,10 +93,16 @@ class ExtractedPosting(BaseModel):
         description="Optional LLM note, e.g. 'deadline was in a countdown widget'",
     )
 
+    @field_validator("location", "extraction_notes", mode="before")
+    @classmethod
+    def coerce_optional_strings(cls, value: Any) -> Any:
+        return _nullish_to_none(value)
+
     @field_validator("deadline", mode="before")
     @classmethod
     def parse_deadline(cls, value: Any) -> date | None:
-        if value is None or value == "":
+        value = _nullish_to_none(value)
+        if value is None:
             return None
         if isinstance(value, date):
             return value

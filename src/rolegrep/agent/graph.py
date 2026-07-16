@@ -30,11 +30,21 @@ def default_user_profile() -> UserProfile:
             "ai engineer intern",
             "data scientist intern",
             "full stack intern",
+            "data engineer intern",
         ],
-        preferred_locations=["remote", "united states", "us"],
+        preferred_locations=[
+            "united states",
+            "usa",
+            "us",
+            "remote",
+            "any us city",
+        ],
         graduation_year=None,
         notes=(
-            "US or remote preferred. Skip hardware/firmware/technician roles. "
+            "Accept ANY US location (Chicago, NYC, SF, Austin, etc.) or remote. "
+            "Do NOT reject a role just because it is onsite in a US city. "
+            "Reject international / non-US locations (Canada, UK, etc.). "
+            "Skip hardware/firmware/technician roles. "
             "Skip roles that require PhD or further education beyond undergrad "
             "unless clearly open to bachelor's students."
         ),

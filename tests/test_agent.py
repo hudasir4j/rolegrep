@@ -30,8 +30,12 @@ def test_agent_pipeline_fetch_extract_dedup(monkeypatch):
             url=url,
             status_code=200,
             title="SWE Intern - Acme",
-            clean_text="Acme is hiring a Software Engineering Intern in Remote. Apply anytime.",
-            text_length=70,
+            clean_text=(
+                "Acme is hiring a Software Engineering Intern in Remote. "
+                "Apply anytime. Build APIs and ship features with the platform team "
+                "during a summer internship."
+            ),
+            text_length=160,
             content_hash="abc123",
             fetch_error=None,
         )

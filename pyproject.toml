@@ -40,6 +40,10 @@ dev = [
 [project.scripts]
 rolegrep-fetch = "rolegrep.cli:main_fetch"
 rolegrep-agent = "rolegrep.cli:main_agent"
+rolegrep-eval = "rolegrep.cli:main_eval"
+rolegrep-db = "rolegrep.cli:main_db"
+rolegrep-monitor = "rolegrep.cli:main_monitor"
+rolegrep-scheduler = "rolegrep.cli:main_scheduler"
 
 [tool.setuptools.packages.find]
 where = ["src"]

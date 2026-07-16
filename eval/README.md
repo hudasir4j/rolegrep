@@ -1,19 +1,42 @@
-# Hand-labeled eval set — YOU fill this in (Week 1 milestone)
+# Hand-labeled eval set
 
-Place your labeled CSV here as `labels.csv` when ready.
+`labels.csv` is the ground-truth set the agent is scored against.
 
-## Columns (suggested)
+## Columns
 
 | column | description |
 |--------|-------------|
-| `id` | unique id, e.g. `001` |
-| `source_url` | career page URL you fetched |
-| `raw_html_path` | optional path under `eval/fixtures/` if you save HTML |
+| `id` | unique id, e.g. `1` |
+| `source_url` | career page URL |
+| `raw_html_path` | optional (unused for now) |
 | `company` | ground-truth company name |
 | `role_title` | ground-truth role title |
 | `location` | ground-truth location (or empty) |
-| `deadline` | ground-truth deadline ISO date (or empty) |
+| `deadline` | ISO date or empty |
 | `is_relevant` | `yes` or `no` for your profile |
 | `notes` | why you labeled it that way |
 
-We paused automated eval until you finish labeling 40–50 real postings.
+## Run the harness
+
+Start small (saves API credits):
+
+```bash
+source .venv/bin/activate
+rolegrep-eval --limit 3
+rolegrep-eval --ids 1,6,15
+```
+
+Full set (~50 LLM calls):
+
+```bash
+rolegrep-eval
+```
+
+Results are saved under `eval/runs/` (JSON + `history.jsonl` score log).
+
+## What it measures
+
+- Per-field precision / recall / accuracy for `company`, `role_title`, `location`, `deadline`
+- Classification accuracy (+ P/R for relevant=yes) for `is_relevant`
+- Latency and token usage when the provider reports it
+- A failure list with a short hypothesis per miss

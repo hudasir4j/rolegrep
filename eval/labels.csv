@@ -1,0 +1,51 @@
+id,source_url,company,role_title,location,deadline,is_relevant,notes
+1,https://job-boards.greenhouse.io/drweng/jobs/7992936,DRW,Software Developer Intern,"Chicago, IL",,yes,
+2,https://job-boards.greenhouse.io/embed/job_app?for=jumptrading&ref=Simplify&token=8002989&utm_source=Simplify,Jump Trading Group,Campus Software Engineer (Intern),"Chicago, IL",,yes,
+3,https://job-boards.greenhouse.io/offerup/jobs/8004171?utm_source=Simplify&ref=Simplify,OfferUp,Software Engineering Intern,"Bellevue, WA",,yes,
+4,https://jobs.ashbyhq.com/centerfield/3279e803-56ab-4e12-8168-c2fd60bc8e60/application?utm_source=Simplify&ref=Simplify,Centerfield,Software Engineer Intern,"Los Angeles, CA",,yes,
+5,https://jobs.lever.co/nextgenfed/35e13d92-343a-4c17-9789-1a6a9cff2bc6/apply?utm_source=Simplify&ref=Simplify,NextGen Federal Systems,Data Science & Machine Learning Intern,Remote,,yes,
+6,https://job-boards.greenhouse.io/uberfreight/jobs/5194491008?utm_source=Simplify&ref=Simplify,Uber Freight,Data Scientist Intern,"Chicago, IL",,yes,
+7,https://job-boards.greenhouse.io/customcomputerspecialists/jobs/4221846009?utm_source=Simplify&ref=Simplify,Custom Computer Specialists,Developer Intern,"Long Island, NY",,yes,
+8,https://job-boards.greenhouse.io/eulerity/jobs/4694300006?utm_source=Simplify&ref=Simplify,Eulerity,Website Development & Content Marketing Intern - AI & Automation,"New York, NY",,yes,
+9,https://jobs.ashbyhq.com/remarcable-inc/38e76aaf-d0b3-40c7-8055-cb7e11ed26cd/application?utm_source=Simplify&ref=Simplify,Remarcable,Full Stack Developer Co-op,"Vancouver, Canada",,no,"International, not in US"
+10,https://jobs.ashbyhq.com/kos.ai/efab6ffb-9658-47f7-8b5f-a295c55957d3/application?utm_source=Simplify&ref=Simplify,kos.ai,Software Engineer Intern,"San Francisco, CA",,yes,
+11,https://jobs.ashbyhq.com/maxima/c0204f04-af26-4a57-9658-64ee6d4beb74/application?utm_source=Simplify&ref=Simplify,Maxima,Software Engineer Intern,"San Mateo, CA",,yes,
+12,https://jobs.ashbyhq.com/espa/6fa2d441-971f-44c4-9a4e-3304ea041cc8/application?utm_source=Simplify&ref=Simplify,Espa AI,Software Engineer Intern,"San Francisco, CA",,yes,
+13,https://jobs.ashbyhq.com/clera/d3c69268-3324-4a84-b911-7a4303672767/application?utm_source=Simplify&ref=Simplify,Clera,Founding Engineer Intern,"San Francisco, CA",,yes,
+14,https://jobs.ashbyhq.com/binance.us/c23e9aa3-0daa-4170-a5a7-b03aaa031895/application?utm_source=Simplify&ref=Simplify,Binance,Software Engineer Intern,Remote,,yes,
+15,https://jobs.ashbyhq.com/AfterQuery/83ca470d-b1f7-41d6-935f-c1f2b8243e4b/application?utm_source=Simplify&ref=Simplify,AfterQuery,Software Engineer Intern,"San Francisco, CA",,yes,
+16,https://job-boards.greenhouse.io/later/jobs/8604889002?utm_source=Simplify&ref=Simplify,Later,AI Automation Engineer Co-op,"Vancouver, Canada",,no,"International, not in US"
+17,https://job-boards.greenhouse.io/iherb/jobs/7776154003?utm_source=Simplify&ref=Simplify,iHerb,Software Development Intern,Remote,,yes,
+18,https://jobs.lever.co/genbio/4bdb14ae-e19f-40c8-84db-1307dbdabe74/apply?utm_source=Simplify&ref=Simplify,GenBio AI,Software Engineer Intern,"Palo Alto, CA",,no,Requires further education
+19,https://jobs.ashbyhq.com/meshy/2f33b2eb-b76d-4618-b299-497471f263b9?utm_source=Simplify&ref=Simplify,Meshy,Data Infra Engineer Intern,"San Francisco, CA",,yes,
+20,https://job-boards.greenhouse.io/asteraearlycareer2026/jobs/4562833005?utm_source=Simplify&ref=Simplify,Astera Labs,Platform Applications Engineer Intern Co-op,"Vancouver, Canada",,no,"International, not in US"
+21,https://jobs.ashbyhq.com/base-power/5353ea33-57d4-46fa-9a96-e392a3f841bc/application?utm_source=Simplify&ref=Simplify,Base Power,Software Engineer Intern,"Austin, TX",,yes,
+22,https://jobs.lever.co/plus-2/1864b1be-25e5-424f-9626-09e58f6147f2/apply?utm_source=Simplify&ref=Simplify,Plus AI,Systems Engineer Intern,"Santa Clara, CA",,no,Requires further education
+23,https://jobs.ashbyhq.com/greatquestion/c533196c-75d5-43b8-b1c8-dedf2437d544/application?utm_source=Simplify&ref=Simplify,Great Question,AI Engineer Intern,"San Francisco, CA",,yes,
+24,https://jobs.lever.co/plus-2/012a2134-8a6a-4982-8f25-f906178a24e4/apply?utm_source=Simplify&ref=Simplify,Plus AI,Software Engineer Intern - Data,"Santa Clara, CA",,yes,
+25,https://jobs.lever.co/plus-2/06b808df-85a1-4ddd-863c-3e1cbe61eda9/apply?utm_source=Simplify&ref=Simplify,Plus AI,Software Engineer Intern - Data Infrastructure and Tools,"Santa Clara, CA",,yes,
+26,https://jobs.lever.co/plus-2/a58986e8-c9a0-4ca3-a8f1-6abec1e88464/apply?utm_source=Simplify&ref=Simplify,Plus AI,Simulation Engineer Intern,"Santa Clara, CA",,yes,
+27,https://jobs.ashbyhq.com/NPX/4a250618-dcfb-4ec9-8687-b2be9e2d6ef2/application?utm_source=Simplify&ref=Simplify,Nuclear Promise X,AI Developer Co-op,Canada,,no,"International, not in US. Also requires further education."
+28,https://job-boards.greenhouse.io/andurilindustries/jobs/5148079007,Anduril Industries,Software Engineer Intern (Summer 2027),"Costa Mesa, CA",,yes,Replacement for unreachable row (was direct-site 403)
+29,https://job-boards.greenhouse.io/aquaticcapitalmanagement/jobs/7990895002,Aquatic Capital Management,"Software Engineer, Intern (Summer 2026)","New York, NY",,yes,Replacement for unreachable row (was Workday 403)
+30,https://job-boards.greenhouse.io/togetherai/jobs/5012768007,Together AI,Software Engineer Intern (Summer 2026),"San Francisco, CA",,yes,Replacement for unreachable row (was Workday 403)
+31,https://job-boards.greenhouse.io/twilio/jobs/7560246,Twilio,Software Engineer Intern - United States,Remote - US,,yes,Replacement for unreachable row (was Oracle Cloud 403)
+32,https://job-boards.greenhouse.io/ziprecruiter/jobs/7289109,ZipRecruiter,Software Engineer - Intern,"Santa Monica, CA",,yes,Replacement for unreachable row (was direct-site 403)
+33,https://jobs.lever.co/matchgroup/ce55175b-fdd1-40ca-9407-7cc5e1533982,Match Group (Tinder),Machine Learning Engineer Intern,"Palo Alto, CA",,yes,Replacement for unreachable row (was Workday 403)
+34,https://jobs.lever.co/voleon/100b2cb6-f9cc-42c3-add9-db143a76f0f0/apply,The Voleon Group,Software Engineer Intern (Summer 2026),"Berkeley, CA",,yes,Replacement for unreachable row (was icims)
+35,https://jobs.lever.co/zoox/74ef6bb8-ec8a-4c6c-8618-544717f40e2d,Zoox,"Machine Learning Engineer Intern, Autonomy Behavior","Foster City, CA",,yes,Replacement for unreachable row (was Workday 403)
+36,https://jobs.ashbyhq.com/notion/23ac2477-0008-4bed-b1c1-81f90a32e9e6,Notion,Software Engineer Intern (Summer 2026),"San Francisco, CA",,yes,Replacement for unreachable row (was direct-site 403)
+37,https://jobs.ashbyhq.com/replit/12737078-74c7-4e63-98a7-5e8da1e9deb1,Replit,Software Engineering Intern (Summer 2026),"San Francisco, CA",,yes,Replacement for unreachable row (was Oracle Cloud 403)
+38,https://jobs.ashbyhq.com/zip/caa5ba75-3b38-4d29-88cd-69a90b01fd6f,Zip,Software Engineer Intern (Fall 2026),"San Francisco, CA",,yes,Replacement for unreachable row (was Workday 403)
+39,https://jobs.ashbyhq.com/NorthwoodSpace/385cac5a-45c0-4ffc-8aec-163c765c469f,Northwood Space,Software Engineer Intern (Summer 2026),"Los Angeles, CA",,yes,Replacement for unreachable row (was Workday 403)
+40,https://jobs.ashbyhq.com/sentry/5e112240-922a-48f1-8865-9e7f89687f39,Sentry,"Software Engineer, Intern (Fall 2026)","San Francisco, CA",,yes,Replacement for unreachable row (was icims)
+41,https://job-boards.greenhouse.io/scaleai/jobs/4606014005,Scale AI,Software Engineering Intern (Summer 2026),"San Francisco, CA",,yes,Replacement for unreachable row (was direct-site 403)
+42,https://jobs.ashbyhq.com/ramp/c50962b5-c641-4d44-bbe5-7f1d6e7ce51f,Ramp,"Software Engineer Internship, Backend","New York, NY",,yes,Replacement for unreachable row (was breezy.hr)
+43,https://jobs.ashbyhq.com/whatnot/8250532f-4bfd-4ee5-a041-4a2e54047cf7,Whatnot,Software Engineer Intern (Summer 2026),"San Francisco, CA",,yes,Replacement for unreachable row (was Dover)
+44,https://job-boards.greenhouse.io/affirm/jobs/7528020003,Affirm,Software Engineering Intern (Summer 2026),"San Francisco, CA",,yes,Replacement for unreachable row (was direct-site 403)
+45,https://job-boards.greenhouse.io/cloudflare/jobs/7206269?gh_jid=7206269,Cloudflare,Software Engineer Intern (Summer 2026),"Austin, TX",,yes,Replacement for unreachable row (was Oracle Cloud 403)
+46,https://job-boards.greenhouse.io/neuralink/jobs/4723041003,Neuralink,Software Engineer Intern,"Fremont, CA",,no,"Hardware/BCI-focused, not fit to my profile. Replacement for unreachable row (was Workday 403)"
+47,https://jobs.lever.co/aisafety/e011814b-9a80-43d6-bb0c-cc153ea4bec4,Center for AI Safety,Research Engineer Intern (Fall 2026),"San Francisco, CA",,no,"Requires co-authored publication at top ML venue (NeurIPS/ICML/etc.), unpaid, research-bar too high for typical undergrad. Replacement for unreachable row (was Generac, hardware)"
+48,https://jobs.ashbyhq.com/cohere/8c035d3d-081d-4c8a-914a-72f4efaad254,Cohere,Software Engineer Intern (Fall/Winter 2026),"Toronto, Canada",,no,"International, not in US. Replacement for unreachable row (was TI, hardware/Oracle Cloud)"
+49,https://jobs.ashbyhq.com/rivianvw.tech/50e43cbe-01ea-4b8b-be4c-bb5f48a2be92,Rivian and Volkswagen Group Technologies,Software Engineering Intern - Connected Systems (Fall 2026),"Plymouth, MI",,no,"Automotive/embedded systems hardware focus, not fit to my profile. Replacement for unreachable row (was icims)"
+50,https://jobs.ashbyhq.com/Aspora/cdbeb5d0-cac7-48eb-a313-2b5034747614,Aspora,Data Engineer Intern,"India (Remote)",,no,"International, not in US. Replacement for unreachable row (was Sandhills, direct-site 403)"

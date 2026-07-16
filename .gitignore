@@ -24,9 +24,10 @@ data/*.db
 data/cache/
 *.sqlite3
 
-# Eval artifacts (you'll add labeled CSV later)
-eval/labels.csv
+# Eval artifacts
 eval/results/
+eval/runs/
+
 
 # Node (for React frontend later)
 node_modules/

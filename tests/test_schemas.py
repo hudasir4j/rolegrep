@@ -30,6 +30,28 @@ def test_confidence_score_must_be_between_0_and_1():
         )
 
 
+def test_nullish_string_location_becomes_none():
+    posting = ExtractedPosting(
+        company="Jump Trading",
+        role_title="Campus Software Engineer (Intern)",
+        location="null",
+        is_relevant=True,
+        confidence_score=0.9,
+    )
+    assert posting.location is None
+
+
+def test_nullish_deadline_becomes_none():
+    posting = ExtractedPosting(
+        company="Acme",
+        role_title="SWE Intern",
+        deadline="none",
+        is_relevant=True,
+        confidence_score=0.9,
+    )
+    assert posting.deadline is None
+
+
 def test_json_schema_for_llm_has_postings_array():
     schema = PostingExtractionResult.json_schema_for_llm()
     assert "postings" in schema.get("properties", {})

@@ -2,48 +2,63 @@
 
 Agentic internship-monitoring assistant: fetch career pages, extract structured postings with an LLM agent, deduplicate with embeddings, and **grade its own accuracy** against a hand-labeled test set.
 
-## Status (Week 2)
+## Status (Week 3)
 
 - [x] Posting JSON schema (`ExtractedPosting`)
 - [x] Fetch tool: URL → clean text from HTML
 - [x] Hand-labeled eval set (`eval/labels.csv`)
 - [x] LangGraph agent: fetch → extract → dedup
-- [ ] Eval harness + SQLite + scheduler (Week 3)
+- [x] Eval harness (`rolegrep-eval`)
+- [x] SQLite storage + daily scheduler
 - [ ] FastAPI + React + Docker + CI (Week 4)
 
 ## Quick start
 
 ```bash
 cd /Users/huda/Documents/rolegrep
-python3.12 -m venv .venv   # needs Python >= 3.11
+python3.12 -m venv .venv
 source .venv/bin/activate
-pip install -e ".[agent,dev]"
-cp .env.example .env       # then add ANTHROPIC_API_KEY or OPENAI_API_KEY
+pip install -e ".[agent,api,dev]"
+cp .env.example .env   # OPENAI_API_KEY or ANTHROPIC_API_KEY
 pytest
 ```
 
-Fetch a page (no API key needed):
-
-```bash
-rolegrep-fetch "https://job-boards.greenhouse.io/drweng/jobs/7992936"
-```
-
-Run the agent (needs API key):
+### Agent / eval
 
 ```bash
 rolegrep-agent "https://job-boards.greenhouse.io/drweng/jobs/7992936"
-rolegrep-agent --json "https://job-boards.greenhouse.io/drweng/jobs/7992936"
+rolegrep-eval --limit 3
+```
+
+### Database + daily monitor
+
+```bash
+# create SQLite DB and seed URLs from your labels (or edit data/watchlist.txt)
+rolegrep-db init --from-labels
+rolegrep-db list-urls
+
+# one-off pass (saves postings into data/rolegrep.db)
+rolegrep-monitor --limit 3
+
+rolegrep-db list-postings
+
+# block and run every day at 09:00 local time
+rolegrep-scheduler
+# or: rolegrep-scheduler --hour 8 --minute 30 --run-now
 ```
 
 ## Project layout
 
 ```
 src/rolegrep/
-  schemas/posting.py   # JSON contract for extracted fields
-  tools/               # fetch, extract, check-duplicate
-  embeddings/          # sentence-transformer similarity
-  agent/graph.py       # LangGraph: fetch → extract → dedup
-  llm.py               # Anthropic / OpenAI factory
-eval/labels.csv        # Your hand-labeled test set
-tests/
+  agent/          # LangGraph pipeline
+  tools/          # fetch, extract, dedup
+  embeddings/     # MiniLM similarity
+  eval/           # harness + metrics
+  db/             # SQLAlchemy models / session
+  monitor/        # watchlist runner + APScheduler
+data/
+  watchlist.txt   # URLs to monitor
+  rolegrep.db     # created at runtime
+eval/labels.csv
 ```

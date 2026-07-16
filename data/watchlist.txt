@@ -1,0 +1,7 @@
+# One career-page URL per line (optional "url | label").
+# Lines starting with # are ignored.
+#
+# Example:
+# https://job-boards.greenhouse.io/drweng/jobs/7992936 | DRW
+#
+# Tip: `rolegrep-db init --from-labels` seeds from eval/labels.csv.
